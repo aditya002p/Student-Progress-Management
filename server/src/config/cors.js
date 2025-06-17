@@ -1,52 +1,60 @@
 /**
- * CORS Configuration
- * Configures Cross-Origin Resource Sharing options for the API
+ * Enhanced CORS Configuration
  */
 
-// Determine allowed origins based on environment
 const getAllowedOrigins = () => {
   const origins = [];
-  
-  // Add environment-specific origins
-  if (process.env.NODE_ENV === 'development') {
-    // In development, allow localhost on common ports
-    origins.push('http://localhost:3000'); // React default
-    origins.push('http://127.0.0.1:3000');
-    origins.push('http://localhost:8080'); // Alternative port
+
+  const env = process.env.NODE_ENV || 'development';
+  console.log(`[CORS] Detected NODE_ENV: ${env}`);
+
+  if (env === 'development') {
+    // Allow localhost ports in development
+    origins.push('http://localhost:5173'); // Vite
+    origins.push('http://127.0.0.1:3000'); // CRA
+    origins.push('http://localhost:8080');
   } else {
-    // In production, use specific allowed origins from env var or default to empty
-    const productionOrigins = process.env.ALLOWED_ORIGINS 
-      ? process.env.ALLOWED_ORIGINS.split(',') 
+    // Use env-provided origins in production
+    const productionOrigins = process.env.ALLOWED_ORIGINS
+      ? process.env.ALLOWED_ORIGINS.split(',')
       : [];
     origins.push(...productionOrigins);
   }
-  
-  // Add any additional origins that should always be allowed
+
   if (process.env.CLIENT_URL) {
     origins.push(process.env.CLIENT_URL);
   }
-  
+
+  console.log(`[CORS] Allowed origins:`, origins);
   return origins;
 };
 
-// CORS configuration
 const corsOptions = {
   origin: function (origin, callback) {
     const allowedOrigins = getAllowedOrigins();
-    
-    // Allow requests with no origin (like mobile apps, curl requests, etc.)
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+
+    console.log(`[CORS] Request origin: ${origin}`);
+
+    if (!origin || allowedOrigins.includes(origin)) {
+      console.log(`[CORS] ✅ Allowed`);
       callback(null, true);
     } else {
+      console.warn(`[CORS] ❌ Blocked: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
-  credentials: true, // Allow cookies to be sent with requests
-  maxAge: 86400, // Cache preflight request results for 24 hours
+  allowedHeaders: [
+    'Origin',
+    'X-Requested-With',
+    'Content-Type',
+    'Accept',
+    'Authorization',
+  ],
+  credentials: true,
+  maxAge: 86400,
   preflightContinue: false,
-  optionsSuccessStatus: 204 // Some legacy browsers choke on 204
+  optionsSuccessStatus: 204,
 };
 
 module.exports = corsOptions;
