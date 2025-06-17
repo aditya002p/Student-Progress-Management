@@ -1,5 +1,6 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @custom-variant dark (&:is(.dark *));
 
@@ -117,4 +118,17 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+/* Additional Styles for Calendar visualization */
+.heatmap-day {
+  transition: all 0.2s ease-in-out;
+}
+
+.heatmap-day:hover {
+  stroke: #000;
+  stroke-width: 1;
+}
+
+.dark .heatmap-day:hover {
+  stroke: #fff;
 }
