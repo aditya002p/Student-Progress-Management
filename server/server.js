@@ -11,7 +11,7 @@ const logger = require('./src/utils/logger');
 const { setupCronJobs } = require('./src/jobs/dataSync');
 
 // Environment variables
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8000;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/student-progress-db';
 
 // Create HTTP server

@@ -14,8 +14,8 @@ export function StudentProvider({ children }) {
     setIsLoading(true)
     setError(null)
     try {
-      const data = await studentService.getAllStudents()
-      setStudents(data)
+      const response = await studentService.getAllStudents()
+      setStudents(response.data)
     } catch (err) {
       setError(err.message || 'Failed to fetch students')
       toast({
@@ -36,18 +36,18 @@ export function StudentProvider({ children }) {
     setIsLoading(true)
     setError(null)
     try {
-      const newStudent = await studentService.addStudent(studentData)
-      setStudents(prev => [...prev, newStudent])
+      const response = await studentService.addStudent(studentData)
+      setStudents(prev => [...prev, response.data.data])
       toast({
         title: "Success",
         description: "Student added successfully",
       })
-      return newStudent
+      return response
     } catch (err) {
       setError(err.message || 'Failed to add student')
       toast({
         title: "Error",
-        description: err.message || "Failed to add student. Please try again.",
+        description: err.response?.data?.message || "Failed to add student. Please try again.",
         variant: "destructive",
       })
       return null
@@ -60,20 +60,20 @@ export function StudentProvider({ children }) {
     setIsLoading(true)
     setError(null)
     try {
-      const updatedStudent = await studentService.updateStudent(id, studentData)
+      const response = await studentService.updateStudent(id, studentData)
       setStudents(prev => 
-        prev.map(student => student._id === id ? updatedStudent : student)
+        prev.map(student => student._id === id ? response.data.data : student)
       )
       toast({
         title: "Success",
         description: "Student updated successfully",
       })
-      return updatedStudent
+      return response
     } catch (err) {
       setError(err.message || 'Failed to update student')
       toast({
         title: "Error",
-        description: err.message || "Failed to update student. Please try again.",
+        description: err.response?.data?.message || "Failed to update student. Please try again.",
         variant: "destructive",
       })
       return null
@@ -110,20 +110,20 @@ export function StudentProvider({ children }) {
     setIsLoading(true)
     setError(null)
     try {
-      const updatedStudent = await studentService.refreshCodeforcesData(id)
+      const response = await studentService.refreshCodeforcesData(id)
       setStudents(prev => 
-        prev.map(student => student._id === id ? updatedStudent : student)
+        prev.map(student => student._id === id ? response.data.data : student)
       )
       toast({
         title: "Success",
         description: "Student data refreshed successfully",
       })
-      return updatedStudent
+      return response
     } catch (err) {
       setError(err.message || 'Failed to refresh student data')
       toast({
         title: "Error",
-        description: err.message || "Failed to refresh student data. Please try again.",
+        description: err.response?.data?.message || "Failed to refresh student data. Please try again.",
         variant: "destructive",
       })
       return null

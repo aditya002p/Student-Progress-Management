@@ -8,7 +8,7 @@ import SubmissionHeatmap from './SubmissionHeatmap'
 import studentService from '@/services/studentService'
 import { PROBLEM_DATA_FILTERS } from '@/utils/constants'
 
-export default function ProblemSolvingData({ studentId }) {
+export default function ProblemSolving({ studentId }) {
   const [filter, setFilter] = useState('30days')
   const [problemData, setProblemData] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -31,7 +31,12 @@ export default function ProblemSolvingData({ studentId }) {
       }
     }
 
-    fetchProblemData()
+    if (studentId) {
+      fetchProblemData()
+    } else {
+      setIsLoading(false)
+      setProblemData(null)
+    }
   }, [studentId, filter, toast])
 
   return (

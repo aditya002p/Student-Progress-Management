@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useToast } from '@/components/common/UI/Toast/useToast'
@@ -5,7 +6,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/common/UI
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/common/UI/Card'
 import StudentActions from '@/components/student/StudentTable/StudentActions'
 import ContestHistory from './ContestHistory/ContestHistory'
-import ProblemSolvingData from './ProblemSolvingData/ProblemSolvingData'
+import ProblemSolving from './ProblemSolving/ProblemSolving'
 import studentService from '@/services/studentService'
 import { formatRelativeTime } from '@/utils/dateUtils'
 import { getRatingColor, getRatingLabel } from '@/utils/chartUtils'
@@ -116,7 +117,7 @@ export default function StudentProfile() {
           <ContestHistory studentId={student._id} />
         </TabsContent>
         <TabsContent value="problem-solving" className="pt-4">
-          <ProblemSolvingData studentId={student._id} />
+          <ProblemSolving studentId={student._id} />
         </TabsContent>
       </Tabs>
     </div>

@@ -72,6 +72,21 @@ exports.fetchUserSubmissions = async (handle) => {
  * @param {string} handle - Codeforces handle
  * @returns {Promise<Array>} Array of contests
  */
+exports.fetchContestProblems = async (contestId) => {
+  try {
+    const response = await makeApiRequest(`/contest.standings?contestId=${contestId}&from=1&count=1`);
+    
+    if (response.status === 'OK') {
+      return response.result.problems;
+    }
+    
+    return [];
+  } catch (error) {
+    logger.error(`Error fetching problems for contest ${contestId}:`, error);
+    throw error;
+  }
+};
+
 exports.fetchUserContests = async (handle) => {
   try {
     const response = await makeApiRequest(`/user.rating?handle=${handle}`);
@@ -401,16 +416,16 @@ function isStudentInactive(submissions, days) {
 }
 
 /**
- * Check if a Codeforces handle exists
- * @param {string} handle - Codeforces handle to check
- * @returns {Promise<boolean>} True if handle exists
+ * Validates a Codeforces handle by checking if the user exists.
+ * @param {string} handle - The Codeforces handle to validate.
+ * @returns {Promise<boolean>} - True if the handle is valid, false otherwise.
  */
-exports.checkHandleExists = async (handle) => {
+exports.validateHandle = async (handle) => {
   try {
     const userInfo = await exports.fetchUserInfo(handle);
     return !!userInfo;
   } catch (error) {
-    logger.error(`Error checking if handle ${handle} exists:`, error);
+    logger.error(`Error validating handle ${handle}:`, error);
     return false;
   }
 };
@@ -423,10 +438,17 @@ exports.checkHandleExists = async (handle) => {
  */
 exports.getUnsolvedProblemsForContest = async (handle, contestId) => {
   try {
-    // This would require additional API calls to get contest problems
-    // and cross-reference with user submissions
-    // For now, returning a placeholder implementation
-    return 0;
+    const [contestProblems, userSubmissions] = await Promise.all([
+      exports.fetchContestProblems(contestId),
+      exports.fetchUserSubmissions(handle)
+    ]);
+
+    const contestSubmissions = userSubmissions.filter(s => s.contestId === contestId && s.verdict === 'OK');
+    const solvedProblems = new Set(contestSubmissions.map(s => s.problemId));
+
+    const unsolvedProblems = contestProblems.filter(p => !solvedProblems.has(`${p.contestId}-${p.index}`));
+
+    return unsolvedProblems.length;
   } catch (error) {
     logger.error(`Error getting unsolved problems for contest ${contestId}:`, error);
     return 0;

@@ -61,7 +61,21 @@ const studentService = {
     }
   },
   
+  getProblemSolvingStats: async (studentId) => {
+    if (!studentId) return Promise.resolve({ data: null });
+    try {
+      const response = await api.get(`/students/${studentId}/problem-solving-stats`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching problem solving stats:', error);
+      throw error;
+    }
+  },
+  
   getStudentContestHistory: async (id, filter) => {
+    if (!id) {
+      return { data: [] };
+    }
     try {
       const response = await api.get(`/students/${id}/contest-history?filter=${filter}`)
       return response.data
@@ -72,6 +86,9 @@ const studentService = {
   },
   
   getStudentProblemData: async (id, filter) => {
+    if (!id) {
+      return { data: { labels: [], datasets: [] } };
+    }
     try {
       const response = await api.get(`/students/${id}/problem-data?filter=${filter}`)
       return response.data

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
@@ -45,7 +46,8 @@ export default function AddStudentForm() {
     setIsValidatingHandle(true)
     try {
       const isValid = await codeforcesService.validateHandle(handle)
-      if (!isValid) {
+      console.log('Validation response from service:', isValid); // Debugging line
+      if (!isValid.data.success) {
         form.setError('codeforcesHandle', { 
           type: 'manual', 
           message: 'Codeforces handle not found or invalid' 
@@ -170,16 +172,12 @@ export default function AddStudentForm() {
               )}
             />
           </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={() => navigate('/students')}
-            >
+          <CardFooter className="flex justify-end gap-4">
+            <Button type="button" variant="outline" onClick={() => navigate('/students')}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Adding...' : 'Add Student'}
+            <Button type="submit" disabled={isSubmitting || isValidatingHandle}>
+              {isSubmitting ? 'Submitting...' : 'Add Student'}
             </Button>
           </CardFooter>
         </form>

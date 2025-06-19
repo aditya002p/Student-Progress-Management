@@ -25,4 +25,7 @@ router.get('/students/:id/distribution', codeforcesController.getRatingDistribut
 // GET /api/codeforces/students/:id/statistics - Get overall statistics for a student
 router.get('/students/:id/statistics', codeforcesController.getOverallStatistics);
 
+// GET /api/codeforces/validate-handle/:handle - Validate a Codeforces handle
+router.get('/validate-handle/:handle', codeforcesController.validateHandle);
+
 module.exports = router;

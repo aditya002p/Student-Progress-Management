@@ -24,10 +24,10 @@ const codeforcesService = {
   validateHandle: async (handle) => {
     try {
       const response = await api.get(`/codeforces/validate-handle/${handle}`)
-      return response.data.valid
+      return response
     } catch (error) {
       console.error(`Error validating handle ${handle}:`, error)
-      return false
+      throw error
     }
   }
 }

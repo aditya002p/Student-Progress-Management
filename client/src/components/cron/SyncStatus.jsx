@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from 'react'
 import { RotateCw, CheckCircle, AlertCircle, Clock } from 'lucide-react'
 import { useToast } from '@/components/common/UI/Toast/useToast'

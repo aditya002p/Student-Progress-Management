@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { 
@@ -32,7 +33,8 @@ export default function Dashboard() {
       try {
         // In a real app, we would have a dashboard API endpoint
         // For this exercise, we'll simulate it by combining data from multiple sources
-        const students = await studentService.getAllStudents()
+        const studentResponse = await studentService.getAllStudents()
+        const students = studentResponse.data || []
         const syncStatus = await cronService.getSyncStatus()
         
         const inactiveStudents = students.filter(student => 

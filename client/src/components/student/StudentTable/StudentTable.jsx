@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Download, Search } from 'lucide-react'
@@ -72,12 +73,6 @@ const filteredStudents = Array.isArray(students)
           >
             <Download className="mr-2 h-4 w-4" />
             Export CSV
-          </Button>
-          <Button 
-            onClick={() => navigate('/students/new')}
-            size="sm"
-          >
-            Add Student
           </Button>
         </div>
       </div>

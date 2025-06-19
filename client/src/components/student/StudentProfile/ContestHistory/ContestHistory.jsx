@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect } from 'react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/common/UI/Select'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/common/UI/Card'
@@ -30,7 +31,12 @@ export default function ContestHistory({ studentId }) {
       }
     }
 
-    fetchContestHistory()
+    if (studentId) {
+      fetchContestHistory()
+    } else {
+      setIsLoading(false)
+      setContestHistory(null)
+    }
   }, [studentId, filter, toast])
 
   return (

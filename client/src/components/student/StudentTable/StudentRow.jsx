@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState } from 'react'
 import { Eye, RefreshCw, Pencil, Trash2 } from 'lucide-react'
 import { useStudentContext } from '@/context/StudentContext'

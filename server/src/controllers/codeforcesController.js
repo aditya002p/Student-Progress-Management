@@ -2,11 +2,30 @@ const CodeforcesData = require('../models/CodeforcesData');
 const Student = require('../models/Student');
 const logger = require('../utils/logger');
 const { subDays } = require('date-fns');
+const codeforcesService = require('../services/codeforcesService');
 
 /**
  * Codeforces Controller
  * Handles all Codeforces-related operations including contest history and problem data
  */
+
+// Controller to validate a Codeforces handle
+exports.validateHandle = async (req, res, next) => {
+  try {
+    // Disable caching for this endpoint to prevent 304 Not Modified responses
+    res.set('Cache-Control', 'no-store');
+
+    const { handle } = req.params;
+    const isValid = await codeforcesService.validateHandle(handle);
+    if (isValid) {
+      res.status(200).json({ success: true, message: 'Handle is valid' });
+    } else {
+      res.status(400).json({ success: false, message: 'Handle is invalid or not found' });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
 
 // Get contest history with filtering by date range
 exports.getContestHistory = async (req, res, next) => {

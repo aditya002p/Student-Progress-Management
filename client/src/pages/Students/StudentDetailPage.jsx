@@ -2,6 +2,8 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Edit } from 'lucide-react'
 import { Button } from '@/components/common/UI/Button'
 import StudentProfile from '@/components/student/StudentProfile/StudentProfile'
+import ContestHistory from '@/components/student/StudentProfile/ContestHistory/ContestHistory';
+import ProblemSolving from '@/components/student/StudentProfile/ProblemSolving/ProblemSolving';
 import EditStudentForm from '@/components/student/StudentForm/EditStudentForm'
 
 export default function StudentDetailPage() {

@@ -49,6 +49,66 @@ exports.getCronJob = async (req, res, next) => {
 };
 
 // Update cron job schedule
+exports.updateCronSettings = async (req, res, next) => {
+  try {
+    const { time, frequency } = req.body;
+
+    if (!time || !frequency) {
+      return res.status(400).json({ success: false, message: 'Time and frequency are required.' });
+    }
+
+    const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
+    if (!timeRegex.test(time)) {
+        return res.status(400).json({ success: false, message: 'Invalid time format. Use HH:MM.' });
+    }
+
+    const [hour, minute] = time.split(':');
+
+    let schedule;
+    switch (frequency) {
+      case 'daily':
+        schedule = `${minute} ${hour} * * *`;
+        break;
+      case 'weekly':
+        schedule = `${minute} ${hour} * * 0`;
+        break;
+      case 'monthly':
+        schedule = `${minute} ${hour} 1 * *`;
+        break;
+      case 'weekdays':
+         schedule = `${minute} ${hour} * * 1-5`;
+         break;
+      default:
+        if (isValidCronExpression(frequency)) {
+            schedule = frequency;
+        } else {
+            return res.status(400).json({ success: false, message: 'Invalid frequency value.' });
+        }
+    }
+    
+    const jobNameToUpdate = 'codeforcesSync';
+    const cronJob = await CronJob.findOne({ name: jobNameToUpdate });
+
+    if (!cronJob) {
+      return res.status(404).json({ success: false, message: `Cron job '${jobNameToUpdate}' not found.` });
+    }
+
+    cronJob.schedule = schedule;
+    await cronJob.save();
+    await scheduleCronJob(cronJob);
+
+    res.status(200).json({
+      success: true,
+      message: 'Cron settings updated successfully.',
+      data: { name: cronJob.name, schedule: cronJob.schedule }
+    });
+
+  } catch (error) {
+    logger.error('Error updating cron settings:', error);
+    next(error);
+  }
+};
+
 exports.updateCronJob = async (req, res, next) => {
   try {
     const { schedule, enabled, timezone, config } = req.body;
@@ -103,6 +163,11 @@ exports.updateCronJob = async (req, res, next) => {
 };
 
 // Manually trigger a cron job
+exports.triggerManualSync = async (req, res, next) => {
+  req.params.name = 'codeforcesSync';
+  return exports.triggerCronJob(req, res, next);
+};
+
 exports.triggerCronJob = async (req, res, next) => {
   try {
     const jobName = req.params.name;
@@ -191,6 +256,51 @@ exports.resetCronJobs = async (req, res, next) => {
     });
   } catch (error) {
     logger.error('Error resetting cron jobs:', error);
+    next(error);
+  }
+};
+
+// Get cron job sync status
+exports.getCronSyncStatus = async (req, res, next) => {
+  try {
+    // Find the data sync cron job (e.g., codeforcesSync)
+    const syncJob = await CronJob.findOne({ name: 'codeforcesSync' });
+
+    if (!syncJob) {
+      return res.status(404).json({
+        success: false,
+        message: 'Sync cron job not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        name: syncJob.name,
+        lastRunAt: syncJob.lastRunAt,
+        lastStatus: syncJob.lastStatus,
+        nextRunAt: syncJob.nextRunAt,
+        enabled: syncJob.enabled
+      }
+    });
+  } catch (error) {
+    logger.error('Error fetching cron sync status:', error);
+    next(error);
+  }
+};
+
+
+
+exports.getCronSettings = async (req, res, next) => {
+  try {
+    const cronJobs = await CronJob.find().select('name schedule');
+    
+    res.status(200).json({
+      success: true,
+      data: cronJobs
+    });
+  } catch (error) {
+    logger.error('Error fetching cron settings:', error);
     next(error);
   }
 };

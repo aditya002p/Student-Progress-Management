@@ -1,0 +1,14 @@
+{"level":"info","message":"Running scheduled Codeforces sync job at 2025-06-15T20:30:00.482Z","service":"student-progress-api","timestamp":"2025-06-16 02:00:00"}
+{"level":"info","message":"Starting Codeforces data sync with batch size 50","service":"student-progress-api","timestamp":"2025-06-16 02:00:00"}
+{"level":"info","message":"No students found to sync","service":"student-progress-api","timestamp":"2025-06-16 02:00:00"}
+{"level":"info","message":"Codeforces sync completed in 94ms","service":"student-progress-api","timestamp":"2025-06-16 02:00:00"}
+{"level":"info","message":"Email reminder would run here (emailReminder)","service":"student-progress-api","timestamp":"2025-06-16 10:00:00"}
+{"level":"info","message":"Connected to MongoDB","service":"student-progress-api","timestamp":"2025-06-16 19:56:51"}
+{"level":"info","message":"Server running on port 5000","service":"student-progress-api","timestamp":"2025-06-16 19:56:51"}
+{"level":"info","message":"Setting up cron jobs...","service":"student-progress-api","timestamp":"2025-06-16 19:56:51"}
+{"level":"info","message":"Cron jobs scheduled","service":"student-progress-api","timestamp":"2025-06-16 19:56:51"}
+{"level":"info","message":"Scheduled cron job codeforcesSync with schedule \"0 2 * * *\" (next run: 2025-06-16T20:30:00.000Z)","service":"student-progress-api","timestamp":"2025-06-16 19:56:52"}
+{"level":"info","message":"Scheduled cron job inactivityCheck with schedule \"0 3 * * *\" (next run: 2025-06-16T21:30:00.000Z)","service":"student-progress-api","timestamp":"2025-06-16 19:56:52"}
+{"level":"info","message":"Scheduled cron job emailReminder with schedule \"0 10 * * *\" (next run: 2025-06-17T04:30:00.000Z)","service":"student-progress-api","timestamp":"2025-06-16 19:56:52"}
+{"level":"info","message":"Successfully set up 3 cron jobs","service":"student-progress-api","timestamp":"2025-06-16 19:56:52"}
+{"level":"info","message":"Logger shutting down...","service":"student-progress-api","timestamp":"2025-06-16 20:01:02"}

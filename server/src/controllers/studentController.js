@@ -4,11 +4,22 @@ const EmailLog = require('../models/EmailLog');
 const logger = require('../utils/logger');
 const { fetchUserInfo, fetchUserSubmissions, fetchUserContests } = require('../services/codeforcesService');
 const { calculateStatistics } = require('../utils/helpers');
+const { calculateProblemSolvingStats } = require('../utils/calculateProblemSolvingStats');
 
 /**
  * Student Controller
  * Handles all student-related operations including CRUD and Codeforces data sync
  */
+
+// Handle GET request for the 'new' student form
+exports.handleNewStudentRequest = (req, res) => {
+  // This route is to avoid conflict with /:id.
+  // It can be used to send initial data for the create form.
+  res.status(200).json({
+    success: true,
+    data: {} // Sending empty object, can be populated with default values if needed
+  });
+};
 
 // Get all students with pagination and filtering
 exports.getStudents = async (req, res, next) => {
@@ -208,24 +219,21 @@ exports.updateStudent = async (req, res, next) => {
 // Delete a student
 exports.deleteStudent = async (req, res, next) => {
   try {
-    const student = await Student.findById(req.params.id);
-    
+    const student = await Student.findByIdAndDelete(req.params.id);
+
     if (!student) {
       return res.status(404).json({
         success: false,
         message: 'Student not found'
       });
     }
-    
-    // Delete the student
-    await student.remove();
-    
-    // Delete associated Codeforces data
-    await CodeforcesData.deleteOne({ student: student._id });
-    
-    // Delete associated email logs
-    await EmailLog.deleteMany({ student: student._id });
-    
+
+    // Also remove associated Codeforces data and email logs
+    await Promise.all([
+      CodeforcesData.deleteMany({ student: student._id }),
+      EmailLog.deleteMany({ student: student._id })
+    ]);
+
     res.status(200).json({
       success: true,
       data: {}
@@ -315,6 +323,58 @@ exports.getEmailReminderHistory = async (req, res, next) => {
     });
   } catch (error) {
     logger.error(`Error fetching email history for student with ID ${req.params.id}:`, error);
+    next(error);
+  }
+};
+
+// GET /api/students/:id/problem-solving-stats - Get problem solving statistics for a student
+exports.getProblemSolvingStats = async (req, res, next) => {
+  try { 
+    const student = await Student.findById(req.params.id).select('codeforcesHandle');
+
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Student not found' });
+    }
+
+    const submissions = await codeforcesService.fetchUserSubmissions(student.codeforcesHandle);
+    const problemSolvingStats = calculateProblemSolvingStats(submissions);
+
+    res.status(200).json({
+      success: true,
+      data: problemSolvingStats
+    });
+  } catch (error) {
+    logger.error(`Error fetching problem solving stats for student ${req.params.id}:`, error);
+    next(error);
+  }
+};
+
+// GET /api/students/:id/contest-history - Get contest history for a student
+exports.getContestHistory = async (req, res, next) => {
+  try {
+    const student = await Student.findById(req.params.id).select('codeforcesHandle');
+
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Student not found' });
+    }
+
+    const contestHistoryData = await codeforcesService.fetchUserContests(student.codeforcesHandle);
+
+    const contestHistory = await Promise.all(contestHistoryData.map(async (contest) => {
+      const unsolvedProblems = await codeforcesService.getUnsolvedProblemsForContest(student.codeforcesHandle, contest.contestId);
+      return {
+        ...contest,
+        unsolvedProblems
+      };
+    }));
+
+    res.status(200).json({
+      success: true,
+      count: contestHistory.length,
+      data: contestHistory
+    });
+  } catch (error) {
+    logger.error(`Error fetching contest history for student ${req.params.id}:`, error);
     next(error);
   }
 };
